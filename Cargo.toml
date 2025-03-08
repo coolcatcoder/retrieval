@@ -1,0 +1,11 @@
+[workspace]
+members = ["retrieval_proc_macros"]
+
+[package]
+name = "retrieval"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+retrieval_proc_macros = {version = "0.1.0", path = "retrieval_proc_macros"}
+#const-random = "0.1.18"
