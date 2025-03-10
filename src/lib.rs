@@ -1,9 +1,9 @@
 #![no_std]
 #![warn(clippy::pedantic)]
 
-pub mod core;
 pub mod convenience;
+pub mod core;
 
 pub mod prelude {
-    pub use crate::convenience::retrieve;
+    pub use crate::convenience::{collect, iterate};
 }

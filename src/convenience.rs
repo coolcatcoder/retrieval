@@ -1,4 +1,4 @@
-pub use retrieval_proc_macros::retrieve;
+pub use retrieval_proc_macros::{collect, iterate};
 
 macro_rules! dollar_sign {
     () => {};

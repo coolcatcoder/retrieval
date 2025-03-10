@@ -2,32 +2,51 @@ use retrieval::prelude::*;
 
 mod other;
 
-#[retrieve]
+macro_rules! magic {
+    ($($_:tt)*) => {};
+}
+
+magic! {
+    retrieval HasStr {
+        const VALUE: &str;
+    }
+
+    retrieval fn collect_value<T: HasStr>(vec: &mut Vec<&str>) {
+        if let Some(value) = T::VALUE {
+            vec.push(value);
+        }
+    }
+
+    #[collect]
+    trait HasStr {
+        const VALUE: Option<&str> = None;
+    }
+
+    #[iterate]
+    fn collect_values<T: HasStr>(values: &mut Vec<&str>) {
+
+    }
+
+    fn main() {
+        let mut values = vec![];
+        collect_values(&mut values);
+    }
+}
+
+#[collect]
 trait HasStr {
     const VALUE: Option<&str> = None;
 }
 
-// trait HasStr: Sized {
-//     fn get_self(self) -> Self {
-//         self
-//     }
-
-//     const VALUE: Option<&str> = None;
-// }
-
-impl HasStr for retrieval::core::DefaultElement {}
-
-fn collect_value<T: HasStr>(_: &impl FnOnce() -> T, vec: &mut Vec<&str>) {
-    if let Some(value) = T::VALUE {
-        vec.push(value);
+#[iterate]
+fn collect_values<A: HasStr>(values: &mut Vec<&str>) {
+    if let Some(value) = A::VALUE {
+        values.push(value);
     }
 }
 
 fn main() {
     let mut values = vec![];
-
-    // TODO: I want this to be retrieval::core::retrieve.
-    retrieval::retrieve!(100, collect_value, &mut values);
-
+    collect_values(&mut values);
     dbg!(values);
 }
