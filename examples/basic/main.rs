@@ -39,8 +39,8 @@ trait HasStr {
 }
 
 #[iterate]
-fn collect_values<A: HasStr>(values: &mut Vec<&str>) {
-    if let Some(value) = A::VALUE {
+fn collect_values<T: HasStr>(values: &mut Vec<&str>) {
+    if let Some(value) = T::VALUE {
         values.push(value);
     }
 }
@@ -49,4 +49,8 @@ fn main() {
     let mut values = vec![];
     collect_values(&mut values);
     dbg!(values);
+}
+
+impl crate::HasStr for retrieval::core::Element<1> {
+    const VALUE: Option<&str> = Some("Hello!!");
 }

@@ -37,7 +37,8 @@ fn main() {
 
     dbg!(values);
 
-    for_each_element_part_1::<Number0>();
+    for_each_element::<Number0>();
+    //for_each_element_part_1::<Number0>();
 }
 
 trait NextElement: HasValue {
@@ -46,7 +47,7 @@ trait NextElement: HasValue {
 }
 
 trait HasValue {
-    const VALUE: &str = "Default";
+    const VALUE: Option<&str> = None;
 }
 
 trait CanHaveValue {}
@@ -63,21 +64,40 @@ macro_rules! create_structs {
     };
 }
 
-retrieval::core::macro_counter_ident!(create_structs 1000);
+const fn uncallable()
+where
+    for<'dummy> [()]: Sized,
+{
+}
 
-struct Number1000;
+// Errors!
+//const _: () = uncallable();
 
-impl CanHaveValue for Number1000 {}
-impl NextElement for Number1000 {
+retrieval::core::macro_counter_ident!(create_structs 10000);
+
+struct Number10000;
+
+impl CanHaveValue for Number10000 {}
+impl NextElement for Number10000 {
     const ROOT: bool = true;
     type Next = Self;
 }
 
-const TESTER: &str = Number101::VALUE;
-
 impl Unpin for Number101 where for<'dummy> [()]: Sized {}
 impl HasValue for Number101 {
-    const VALUE: &str = "Wow!";
+    const VALUE: Option<&str> = Some("Wow!");
+}
+
+fn for_each_element<T: NextElement + HasValue>() {
+    if let Some(value) = T::VALUE {
+        dbg!(value);
+    }
+
+    if T::ROOT {
+        return;
+    }
+
+    for_each_element::<T::Next>();
 }
 
 const fn for_each_element_part_1<T: NextElement + HasValue>() {

@@ -134,8 +134,7 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
     external.sig.generics.params = generics.collect();
 
     // Very confusing. Iterating all combinations is tough.
-    let elements: Vec<TokenStream> =
-        Vec::with_capacity(100_usize.pow(witnesses.len() as u32));
+    let elements: Vec<TokenStream> = Vec::with_capacity(100_usize.pow(witnesses.len() as u32));
 
     for i in 0..100_u32.pow(witnesses.len() as u32) {
         let inner = ();
