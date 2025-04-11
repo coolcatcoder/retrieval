@@ -18,7 +18,7 @@ const fn collect<T: Has>(messages: &mut [Option<&str>], index: &mut usize, _: &d
         Reason::Add => {
             messages[*index] = Some(T::VALUE);
             *index += 1;
-        },
+        }
         Reason::Checkpoint => (),
         Reason::End => return,
     }
@@ -35,61 +35,29 @@ const fn collect_messages() -> [Option<&'static str>; 100] {
     messages
 }
 
+const MESSAGES: [Option<&str>; 100] = collect_messages();
+
 fn main() {
-    
+    MESSAGES.iter().for_each(|message| {
+        if let Some(message) = message {
+            println!("{}", message);
+        }
+    });
 }
 
 #[something]
 impl Has {
-    const VALUE: &'static str = "Automatic!!";
-}
-
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
+    const VALUE: &'static str = "Automatic!";
 }
 #[something]
 impl Has {
-    const VALUE: &'static str = "Hello world!";
+    const VALUE: &'static str = "Automatic!";
 }
 #[something]
 impl Has {
-    const VALUE: &'static str = "Hello world!";
+    const VALUE: &'static str = "Automatic!";
 }
 #[something]
 impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
-}
-
-#[something]
-impl Has {
-    const VALUE: &'static str = "Hello world!";
+    const VALUE: &'static str = "Automatic!";
 }

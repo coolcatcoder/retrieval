@@ -312,3 +312,145 @@ fn something_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<Tok
 
     Ok(item.to_token_stream())
 }
+
+// NEW UNIMPL
+
+#[proc_macro_attribute]
+pub fn collect_unimpl(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
+    let item = parse_macro_input!(item as ItemTrait);
+    collect_internal_unimpl(input.into(), item)
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+fn collect_internal_unimpl(
+    input: TokenStream,
+    mut item: ItemTrait,
+) -> syn::Result<TokenStream> {
+    if !input.is_empty() {
+        return Err(syn::Error::new(
+            input.span(),
+            "This attribute accepts nothing but itself.",
+        ));
+    }
+
+    let trait_ident = &item.ident;
+
+    item.items.push(TraitItem::Verbatim(quote! {
+        /// The next type in the chain.
+        type NEXT: #trait_ident;
+
+        /// Is this the end of the chain?
+        const END: bool = false;
+    }));
+
+    let mut output = quote! {
+        #item
+
+        struct Container<const INDEX: usize>;
+
+        /// The final implementation.
+        /// Only implemented once, at the end.
+        trait Final {}
+
+        impl #trait_ident for Container<0> {
+            type NEXT = Self;
+            const END: bool = true;
+        }
+        impl Final for Container<0>
+        where
+            for<'a> Switch0: Unpin,
+        {}
+    };
+    generate_switches(&mut output);
+
+    Ok(output)
+}
+
+#[proc_macro]
+pub fn testing_drop(input: StdTokenStream) -> StdTokenStream {
+    let mut output = quote! {
+        struct Assert<const BOOL: bool>;
+        trait False {}
+        impl False for Assert<false> {}
+
+        struct Container<const INDEX: usize>;
+
+        /// The final implementation.
+        /// Only implemented once, at the end.
+        trait Final {}
+
+        /// We store traits on a type, that then goes to another type, and another and another.
+        trait TraitChain {
+            type NEXT: TraitChain;
+            /// Is this the end of the chain?
+            const END: bool = false;
+
+            const STR: &str;
+        }
+
+        // impl Caller for Container<0>
+        // where
+        //     for<'a> Assert<{ std::mem::needs_drop::<Switch0>() }>: False,
+        // {
+        //     const LENGTH: usize = 0;
+        // }
+        impl TraitChain for Container<0> {
+            type NEXT = Self;
+            const END: bool = true;
+            const STR: &str = "";
+        }
+        impl Final for Container<0>
+        where
+            for<'a> Switch0: Unpin,
+        {}
+    };
+
+    generate_switches(&mut output);
+
+    output.into()
+}
+
+fn generate_switches(output: &mut TokenStream) {
+    (0..2000).for_each(|index| {
+        let ident = Ident::new(&format!("Switch{index}"), Span::call_site());
+        output.extend(quote! {
+            struct #ident;
+        });
+    });
+}
+
+#[proc_macro]
+pub fn drop_send(input: StdTokenStream) -> StdTokenStream {
+    // Sadly the only way I know of counting...
+    static INDEX: AtomicU32 = AtomicU32::new(0);
+    let index = INDEX.fetch_add(1, Ordering::Relaxed);
+
+    let index_previous = LitInt::new(&(index).to_string(), Span::call_site());
+    let index_current = LitInt::new(&(index+1).to_string(), Span::call_site());
+    let switch_previous = Ident::new(&format!("Switch{index}"), Span::call_site());
+    let switch_current = Ident::new(&format!("Switch{}", index+1), Span::call_site());
+
+    let output = quote! {
+        // impl Drop for #switch_previous {
+        //     fn drop(&mut self) {}
+        // }
+        // impl Caller for Container<#index_current>
+        // where
+        //     for<'a> Assert<{ std::mem::needs_drop::<#switch_current>() }>: False,
+        // {
+        //     const LENGTH: usize = #index_current;
+        // }
+        impl TraitChain for Container<#index_current> {
+            type NEXT = Container<#index_previous>;
+            const STR: &str = "a";
+        }
+        impl Unpin for #switch_previous where for<'a> [()]: Sized {}
+        impl Final for Container<#index_current>
+        where
+            for<'a> #switch_current: Unpin,
+        {}
+    };
+
+    output.into()
+}

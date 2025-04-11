@@ -1,0 +1,317 @@
+trait Has: Sized {
+    const VALUE: &str = "";
+    const REASON: Reason = Reason::Add;
+    fn __get_self(self) -> Self {
+        self
+    }
+    fn __next() -> impl Has;
+}
+impl Has for DerefOnly<Checkpoint<0u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                1u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<1u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                2u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<2u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                3u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<3u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                4u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<4u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                5u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<5u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                6u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<6u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                7u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<7u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                8u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<8u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                9u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<9u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                10u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<10u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                11u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<11u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                12u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<12u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                13u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<13u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                14u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<14u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                15u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<15u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                16u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<16u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                17u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<17u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                18u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<18u32>> {
+    const REASON: Reason = Reason::Checkpoint;
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                19u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<Checkpoint<19u32>> {
+    const REASON: Reason = Reason::End;
+    fn __next() -> impl Has {
+        DerefOnly::<Checkpoint<19u32>>::new()
+    }
+}
+fn print_messages<T: Has>() {
+    {
+        ::std::io::_print(format_args!("{0}\n", T::VALUE));
+    };
+}
+const fn collect<T: Has>(
+    messages: &mut [Option<&str>],
+    index: &mut usize,
+    _: &dyn FnOnce() -> T,
+) {
+    match T::REASON {
+        Reason::Add => {
+            messages[*index] = Some(T::VALUE);
+            *index += 1;
+        }
+        Reason::Checkpoint => {}
+        Reason::End => return,
+    }
+    collect(messages, index, &(|| T::__next()));
+}
+const fn collect_messages() -> [Option<&'static str>; 100] {
+    let mut messages = [None; 100];
+    let mut index = 0;
+    collect(
+        &mut messages,
+        &mut index,
+        &(|| {
+            DerefOnly::<
+                &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                    0,
+                >,
+            >::new()
+                .__get_self()
+        }),
+    );
+    messages
+}
+const MESSAGES: [Option<&str>; 100] = collect_messages();
+fn main() {
+    MESSAGES
+        .iter()
+        .for_each(|message| {
+            if let Some(message) = message {
+                {
+                    ::std::io::_print(format_args!("{0}\n", message));
+                };
+            }
+        });
+}
+impl Has
+for DerefOnly<
+    &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<7u32>,
+> {
+    const VALUE: &'static str = "Automatic!";
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<7u32>,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has
+for DerefOnly<
+    &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+        1u32,
+    >,
+> {
+    const VALUE: &'static str = "Automatic!";
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&Checkpoint<
+                1u32,
+            >,
+        >::new()
+            .__get_self()
+    }
+}
+impl Has for DerefOnly<&&Checkpoint<11u32>> {
+    const VALUE: &'static str = "Automatic!";
+    fn __next() -> impl Has {
+        DerefOnly::<&Checkpoint<11u32>>::new()
+            .__get_self()
+    }
+}
+impl Has
+for DerefOnly<&&&&&&&&&&&&&&&&&Checkpoint<6u32>> {
+    const VALUE: &'static str = "Automatic!";
+    fn __next() -> impl Has {
+        DerefOnly::<
+            &&&&&&&&&&&&&&&&Checkpoint<6u32>,
+        >::new()
+            .__get_self()
+    }
+}
