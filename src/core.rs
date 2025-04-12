@@ -1,7 +1,7 @@
 // TODO: Try many traits. Try (Element<0>.get_self(),Element<1>.get_self(),etc).
 
 use core::ops::Deref;
-pub use retrieval_proc_macros::{macro_counter, macro_counter_ident, testing_drop, drop_send};
+pub use retrieval_proc_macros::{macro_counter, macro_counter_ident, drop_send};
 
 /// An element of the trait collection.
 /// It may help to think of this as an Option. It may contain your collected traits, or it may fall back to your implementation on [`DefaultElement`].

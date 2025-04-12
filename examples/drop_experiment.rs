@@ -1,6 +1,6 @@
-#![recursion_limit = "1000"]
+use retrieval_proc_macros::{collect_unimpl, drop_send, something_unimpl};
 
-use retrieval_proc_macros::{collect_unimpl, drop_send, testing_drop};
+struct __RetrievalBlah;
 
 // SETUP
 //testing_drop!();
@@ -10,7 +10,10 @@ trait TraitChain {
 }
 
 // FAR AWAY IMPLS
-drop_send!();
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "Hello world!";
+}
 
 // COLLECTION:
 const fn get_length<const INDEX: usize>() -> usize
@@ -51,1005 +54,552 @@ fn main() {
     let mut messages = [""; 1000];
     let mut index = 0;
     collect_messages_1::<Container<GOTTEN_LENGTH>>(&mut messages, &mut index);
-    println!("{:?}", messages);
+    messages[0..index].into_iter().for_each(|message| {
+        //println!("{}", message);
+    });
 }
 
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
-drop_send!();
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
+#[something_unimpl]
+impl TraitChain {
+    const STR: &str = "So cool!";
+}
