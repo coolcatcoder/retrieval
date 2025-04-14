@@ -8,4 +8,3 @@ edition = "2024"
 
 [dependencies]
 retrieval_proc_macros = {version = "0.1.0", path = "retrieval_proc_macros"}
-#const-random = "0.1.18"
