@@ -1,7 +1,10 @@
 use proc_macro::TokenStream as StdTokenStream;
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{
+    OnceLock,
+    atomic::{AtomicU32, Ordering},
+};
 use syn::{
     FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, TraitItem, Type,
     parse_macro_input, spanned::Spanned,
@@ -103,8 +106,31 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 
     // Sadly the only way I know of counting...
     // TODO: Replace with dashmap or something like that to handle multiple traits.
-    static INDEX: AtomicU32 = AtomicU32::new(0);
-    let index = INDEX.fetch_add(1, Ordering::Relaxed);
+    //static TRAIT_COUNTERS: LazyLock<DashMap<String, AtomicU32, foldhash::fast::FixedState>> = LazyLock::new(|| {DashMap::with_hasher(foldhash::fast::FixedState::with_seed(13578576515223716000))});
+    //static TRAIT_COUNTERS: DashMap<String, u32, foldhash::fast::FixedState> = DashMap::with_hasher(foldhash::fast::FixedState::with_seed(13578576515223716000));
+    //static INDEX: AtomicU32 = AtomicU32::new(0);
+    //let index = INDEX.fetch_add(1, Ordering::Relaxed);
+    //let index = *TRAIT_COUNTERS.ins
+    // TODO: A max of 5 traits? That sucks.
+    static TRAIT_COUNTERS: [(AtomicU32, OnceLock<String>); 5] =
+        [const { (AtomicU32::new(0), OnceLock::new()) }; 5];
+
+    let trait_ident = item.self_ty.to_token_stream().to_string();
+    let mut index = None;
+    for (maybe_index, ident) in TRAIT_COUNTERS.iter() {
+        let ident = ident.get_or_init(|| trait_ident.clone());
+        if *ident == trait_ident {
+            index = Some(maybe_index.fetch_add(1, Ordering::Relaxed));
+            break;
+        }
+    }
+
+    let Some(index) = index else {
+        return Err(syn::Error::new(
+            item.self_ty.span(),
+            "Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.",
+        ));
+    };
 
     let index_previous = LitInt::new(&(index).to_string(), Span::call_site());
     let index_current = LitInt::new(&(index + 1).to_string(), Span::call_site());
@@ -113,6 +139,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
         &mut *item.self_ty,
         Type::Verbatim(quote! {retrieval::Container<#index_current>}),
     );
+
     item.trait_ = Some((
         None,
         syn::parse2(self_ty.to_token_stream())?,

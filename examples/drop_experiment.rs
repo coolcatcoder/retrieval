@@ -10,6 +10,9 @@ trait Different {
     //type Blah = ();
 }
 
+#[send]
+impl Different {}
+
 #[iterate]
 const fn collect_messages<T: Message>(messages: &mut [&str], index: &mut usize) {
     messages[*index] = T::STR;
