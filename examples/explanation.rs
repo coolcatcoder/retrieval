@@ -1,9 +1,7 @@
 //! This example shows how this crate works and what it roughly expands to.
 
 /// Contains the retrieved implementations.
-/// INDEX has 2 purposes.
-/// The first being to store each implementation under different indices.
-/// The second is tricking inference into finding the last index.
+/// Each implementation is stored under a different INDEX.
 struct Container<const INDEX: usize>;
 
 /// The trait that we collect implementations of.
@@ -25,15 +23,14 @@ trait Final {}
 const LENGTH: usize = {
     const fn get_length<const INDEX: usize>() -> usize
     where
-        crate::Container<INDEX>: Final,
+        Container<INDEX>: Final,
     {
         INDEX
     }
     get_length()
 };
 
-// Switches allow us to perform a slightly modified auto trait specialisation.
-// For more info see: https://github.com/coolcatcoder/rust_techniques/issues/1
+// Switches allow us to perform a slightly modified auto trait specialisation. (https://github.com/coolcatcoder/rust_techniques/issues/1)
 // Basically by implementing Unpin for Switch0<false>, then Switch0<true> is no longer Unpin.
 // Also, because we do not know how many implementations we are going to collect, we generate 1000 switches by default.
 struct Switch0<const BOOL: bool>;
@@ -41,7 +38,7 @@ struct Switch1<const BOOL: bool>;
 struct Switch2<const BOOL: bool>;
 
 // The required 0th implementation, so that we know once we have iterated over every implementation.
-impl Message for crate::Container<0> {
+impl Message for Container<0> {
     type NEXT = Self;
     const END: bool = true;
 }
@@ -64,9 +61,9 @@ fn collect_messages() {
 }
 
 // The first message, so we store it in INDEX 1.
-impl Message for crate::Container<1> {
+impl Message for Container<1> {
     const STR: &str = "Hello world!";
-    type NEXT = crate::Container<0>;
+    type NEXT = Container<0>;
 }
 // By implementing Unpin for Switch0<false> we cause Switch0<true> to not implement Unpin.
 // This causes Container<0> to no longer be marked as Final.
@@ -81,9 +78,9 @@ fn main() {
 }
 
 // The second message, so we store it in INDEX 2.
-impl Message for crate::Container<2> {
+impl Message for Container<2> {
     const STR: &str = "Hello again!";
-    type NEXT = crate::Container<1>;
+    type NEXT = Container<1>;
 }
 // By implementing Unpin for Switch1<false> we cause Switch1<true> to not implement Unpin.
 // This causes Container<1> to no longer be marked as Final.
