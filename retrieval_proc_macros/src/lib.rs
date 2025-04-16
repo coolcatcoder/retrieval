@@ -6,9 +6,30 @@ use std::sync::{
     atomic::{AtomicU32, Ordering},
 };
 use syn::{
-    FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, TraitItem, Type,
-    parse_macro_input, spanned::Spanned,
+    FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, Token, TraitItem, Type,
+    parse::Parse, parse_macro_input, spanned::Spanned,
 };
+
+struct RetrieveAttribute {
+    capacity: u32,
+}
+
+impl Parse for RetrieveAttribute {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let capacity = match input.parse::<Option<Ident>>()? {
+            Some(_) => {
+                input.parse::<Token![=]>()?;
+                input.parse::<LitInt>()?.base10_parse()?
+            }
+            None => match input.parse::<Option<LitInt>>()? {
+                Some(capacity) => capacity.base10_parse()?,
+                None => 1000,
+            },
+        };
+
+        Ok(RetrieveAttribute { capacity })
+    }
+}
 
 /// Place on a trait to turn it into a retrieval trait.
 /// This has to be done in the crate root currently. Everything else can be used anywhere.
@@ -22,12 +43,7 @@ pub fn retrieve(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
 }
 
 fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<TokenStream> {
-    if !input.is_empty() {
-        return Err(syn::Error::new(
-            input.span(),
-            "This attribute accepts nothing but itself.",
-        ));
-    }
+    let capacity = syn::parse2::<RetrieveAttribute>(input)?.capacity;
 
     let trait_ident = &item.ident;
     let mod_ident = Ident::new(&trait_ident.to_string().to_lowercase(), Span::call_site());
@@ -40,7 +56,8 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
         const END: bool = false;
     }));
 
-    let switches = generate_switches(1000);
+    // One extra for the one required impl.
+    let switches = generate_switches(capacity+1);
 
     let output = quote! {
         #item
