@@ -6,29 +6,36 @@ use std::sync::{
     atomic::{AtomicU32, Ordering},
 };
 use syn::{
-    FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, Token, TraitItem, Type,
-    parse::Parse, parse_macro_input, spanned::Spanned,
+    parse::Parse, parse_macro_input, spanned::Spanned, FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, Pat, Stmt, Token, TraitItem, Type
 };
 
-struct RetrieveAttribute {
-    capacity: u32,
-}
+/// Allows a number in the attribute, or goes with a default.
+/// Optionally allows ident= before the number, where ident can be any ident.
+struct NumberAttribute<const DEFAULT: u32>(u32);
 
-impl Parse for RetrieveAttribute {
+impl<const DEFAULT: u32> Parse for NumberAttribute<DEFAULT> {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let capacity = match input.parse::<Option<Ident>>()? {
+        Ok(NumberAttribute(match input.parse::<Option<Ident>>()? {
             Some(_) => {
                 input.parse::<Token![=]>()?;
                 input.parse::<LitInt>()?.base10_parse()?
             }
             None => match input.parse::<Option<LitInt>>()? {
                 Some(capacity) => capacity.base10_parse()?,
-                None => 1000,
+                None => DEFAULT,
             },
-        };
-
-        Ok(RetrieveAttribute { capacity })
+        }))
     }
+}
+
+/// Gets the internal module ident from the trait ident.
+fn module_from_trait(trait_ident: &impl ToString) -> Ident {
+    Ident::new(
+        &trait_ident
+            .to_string()
+            .to_lowercase(),
+        Span::call_site(),
+    )
 }
 
 /// Place on a trait to turn it into a retrieval trait.
@@ -43,10 +50,10 @@ pub fn retrieve(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
 }
 
 fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<TokenStream> {
-    let capacity = syn::parse2::<RetrieveAttribute>(input)?.capacity;
+    let capacity = syn::parse2::<NumberAttribute::<1000>>(input)?.0;
 
     let trait_ident = &item.ident;
-    let mod_ident = Ident::new(&trait_ident.to_string().to_lowercase(), Span::call_site());
+    let module_ident = module_from_trait(trait_ident);
 
     item.items.push(TraitItem::Verbatim(quote! {
         /// The next type in the chain.
@@ -62,7 +69,7 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     let output = quote! {
         #item
 
-        mod #mod_ident {
+        mod #module_ident {
             /// The final implementation.
             /// Only implemented once, at the end.
             pub trait Final {}
@@ -84,9 +91,9 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             type NEXT = Self;
             const END: bool = true;
         }
-        impl #mod_ident::Final for retrieval::Container<0>
+        impl #module_ident::Final for retrieval::Container<0>
         where
-            for<'a> #mod_ident::Switch0: core::marker::Unpin,
+            for<'a> #module_ident::Switch0: core::marker::Unpin,
         {}
     };
 
@@ -197,83 +204,90 @@ pub fn iterate(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
         .into()
 }
 
-fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<TokenStream> {
-    if !input.is_empty() {
-        return Err(syn::Error::new(
-            input.span(),
-            "This attribute accepts nothing but itself.",
-        ));
-    }
+fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenStream> {
+    // Work out how many functions we will need to reach the target recursion limit.
+    let recursion_limit = syn::parse2::<NumberAttribute::<128>>(input)?.0;
+    let functions_needed = recursion_limit.div_ceil(128);
 
     if internal.sig.generics.params.len() != 1 {
         return Err(syn::Error::new(
             internal.sig.generics.span(),
-            "Only one generic is supported at this time.\nPlease see TODO: Insert issue number here.",
+            "Only one generic is supported at this time.\nPlease see https://github.com/coolcatcoder/retrieval/issues/7.",
         ));
     }
 
     let generic = internal.sig.generics.type_params().next().unwrap();
-    let syn::TypeParamBound::Trait(generic_trait) = generic.bounds.first().unwrap() else {
+    let syn::TypeParamBound::Trait(trait_bound) = generic.bounds.first().unwrap() else {
         return Err(syn::Error::new(
             generic.bounds.span(),
-            "The singular generic should only have a trait bound.\nPlease see TODO: Insert issue number here.",
+            "The singular generic should only have one trait bound.\nPlease see https://github.com/coolcatcoder/retrieval/issues/7.",
         ));
     };
-    let mod_ident = Ident::new(
-        &generic_trait
-            .path
-            .segments
-            .last()
-            .unwrap()
-            .ident
-            .to_string()
-            .to_lowercase(),
-        Span::call_site(),
-    );
+
+    // Get the module from the last segment of the trait bound.
+    let module_ident = module_from_trait(&trait_bound
+        .path
+        .segments
+        .last()
+        .unwrap()
+        .ident);
+
     let generic_ident = &generic.ident;
+
+    // Create the external function's signature from the internal's but without the generics.
     let mut external_sig = internal.sig.clone();
     external_sig.generics = Default::default();
+    let external_ident = &external_sig.ident;
+    let inputs: Vec<&Pat> = external_sig.inputs.iter().map(|input| {
+        let FnArg::Typed(input) = input else {
+            panic!("Cannot have self input. That doesn't make sense.");
+        };
 
-    let external_ident = internal.sig.ident;
-    internal.sig.ident = Ident::new(
-        &format!("__internal_{}", &external_ident),
+        &*input.pat
+    }).collect();
+
+    // The first internal function's ident.
+    let internal_start_ident = Ident::new(
+        &format!("__internal_0_{}", external_ident),
         Span::call_site(),
     );
-    let internal_ident = &internal.sig.ident;
 
-    internal.block.stmts.insert(
-        0,
-        syn::parse2(quote! {
-            if #generic_ident::END {
-                return;
-            }
-        })?,
-    );
-    let inputs = internal.sig.inputs.iter().map(|input| {
-        let FnArg::Typed(input) = input else {
-            panic!("Cannot have self input. That doesn't make sense.");
-        };
-
-        &input.pat
-    });
-    let inputs_again = internal.sig.inputs.iter().map(|input| {
-        let FnArg::Typed(input) = input else {
-            panic!("Cannot have self input. That doesn't make sense.");
-        };
-
-        &input.pat
-    });
-    internal.block.stmts.push(syn::parse2(
-        quote! {#internal_ident::<T::NEXT>(#(#inputs),*);},
-    )?);
-
-    let output = quote! {
-        #internal
-
+    let mut output = quote! {
         #external_sig {
-            #internal_ident::<retrieval::Container<{crate::#mod_ident::LENGTH}>>(#(#inputs_again),*);
+            #internal_start_ident::<retrieval::Container<{crate::#module_ident::LENGTH}>>(#(#inputs),*);
         }
     };
+
+    let if_end: Stmt = syn::parse2(quote! {
+        if #generic_ident::END {
+            return;
+        }
+    })?;
+
+    for index in 0..functions_needed {
+        let next_index = if index == functions_needed-1 {0}else{index+1};
+        let mut internal = internal.clone();
+
+        internal.sig.ident = Ident::new(
+            &format!("__internal_{}_{}", index, &external_ident),
+            Span::call_site(),
+        );
+
+        internal.block.stmts.insert(
+            0,
+            if_end.clone(),
+        );
+
+        let internal_next_ident = Ident::new(
+            &format!("__internal_{}_{}", next_index, external_ident),
+            Span::call_site(),
+        );
+        internal.block.stmts.push(syn::parse2(
+            quote! {#internal_next_ident::<T::NEXT>(#(#inputs),*);},
+        )?);
+
+        output.extend(quote!{#internal});
+    }
 
     Ok(output)
 }
