@@ -5,6 +5,7 @@ members = ["retrieval_proc_macros"]
 name = "retrieval"
 version = "0.1.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 retrieval_proc_macros = {version = "0.1.0", path = "retrieval_proc_macros"}

@@ -2,7 +2,8 @@ Allows the retrieval of trait implementations.
 
 Still very much a work in progress.
 
-## Explanation of this madness:
+## Explanation of this Madness
+
 Imagine if you could store a list of types, consts, and functions, all at compile time.
 There are various ways of accomplishing that, but now what if instead you could automatically generate that list from desired items located anywhere in your crate?
 It is possible, using this crate.
@@ -102,3 +103,20 @@ impl Final for Container<2> where for<'a> Switch2<true>: Unpin {}
 ```
 This unfortunately does require us to be able to count in the proc macro, which sadly means we have to use static abuse...
 This may not work with proc macro caching, and in fact could stop working at any moment. We are hopeful that rust will add proper state to proc macros before they break this trick.
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0
+   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license
+   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
