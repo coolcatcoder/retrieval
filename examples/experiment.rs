@@ -1,3 +1,5 @@
+//! Please move this to a test somewhere?
+
 use retrieval::prelude::*;
 
 #[retrieve]
@@ -7,11 +9,15 @@ trait Message {
 
 #[retrieve]
 trait Different {
-    //type Blah = ();
+    type Blah = ();
+    type Two = ();
 }
 
 #[send]
-impl Different {}
+impl Different {
+    type Blah = ();
+    type Two = i32;
+}
 
 #[iterate]
 const fn collect_messages<T: Message>(messages: &mut [&str], index: &mut usize) {

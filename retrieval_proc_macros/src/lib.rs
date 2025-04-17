@@ -55,6 +55,21 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     let trait_ident = &item.ident;
     let module_ident = module_from_trait(trait_ident);
 
+    // Associated types aren't allowed defaults, so we remove them, and pass the default to our initial implementation.
+    let default_types: Vec<TokenStream> = item.items.iter_mut().filter_map(|item| {
+        let TraitItem::Type(item) = item else {
+            return None;
+        };
+
+        let Some(default) = item.default.take() else {
+            return None;
+        };
+        let ident = &item.ident;
+        let default_type = default.1;
+
+        Some(quote! {type #ident = #default_type;})
+    }).collect();
+
     item.items.push(TraitItem::Verbatim(quote! {
         /// The next type in the chain.
         type NEXT: #trait_ident;
@@ -88,6 +103,7 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
         }
 
         impl #trait_ident for retrieval::Container<0> {
+            #(#default_types)*
             type NEXT = Self;
             const END: bool = true;
         }
