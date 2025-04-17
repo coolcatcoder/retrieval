@@ -6,3 +6,19 @@ pub mod prelude {
 }
 
 pub struct Container<const INDEX: usize>;
+
+// #[cfg(test)]
+// mod tests {
+//     use crate as retrieval;
+//     use retrieval::prelude::*;
+
+//     #[retrieve]
+//     trait RetrieveTester {
+
+//     }
+
+//     #[retrieve]
+//     trait One {
+//         const STR: &str = "";
+//     }
+// }

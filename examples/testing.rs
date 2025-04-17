@@ -1,5 +1,3 @@
-//! Please move this to a test somewhere?
-
 use retrieval::prelude::*;
 
 #[retrieve]
