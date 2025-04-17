@@ -105,16 +105,18 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
         mod #module_ident {
             /// The final implementation.
             /// Only implemented once, at the end.
+            #[doc(hidden)]
             pub trait Final {}
 
-            pub const LENGTH: usize = {
-                const fn get_length<const INDEX: usize>() -> usize
+            /// The amount of implementations of this trait.
+            pub const QUANTITY: usize = {
+                const fn get_quantity<const INDEX: usize>() -> usize
                 where
                     retrieval::Container<INDEX>: Final,
                 {
                     INDEX
                 }
-                get_length()
+                get_quantity()
             };
 
             #switches
@@ -139,6 +141,7 @@ fn generate_switches(amount: u32) -> TokenStream {
     (0..amount).for_each(|index| {
         let ident = Ident::new(&format!("Switch{index}"), Span::call_site());
         output.extend(quote! {
+            #[doc(hidden)]
             pub struct #ident;
         });
     });
@@ -245,8 +248,8 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 ///     *index += 1;
 /// }
 ///
-/// const MESSAGES: [&str; message::LENGTH] = {
-///     let mut messages = [""; message::LENGTH];
+/// const MESSAGES: [&str; message::QUANTITY] = {
+///     let mut messages = [""; message::QUANTITY];
 ///     let mut index = 0;
 ///
 ///     collect_messages(&mut messages, &mut index);
@@ -310,7 +313,7 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
 
     let mut output = quote! {
         #external_sig {
-            #internal_start_ident::<retrieval::Container<{crate::#module_ident::LENGTH}>>(#(#inputs),*);
+            #internal_start_ident::<retrieval::Container<{crate::#module_ident::QUANTITY}>>(#(#inputs),*);
         }
     };
 

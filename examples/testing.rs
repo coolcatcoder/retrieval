@@ -51,7 +51,7 @@ impl Message {
 /// So cool!
 /// Hello world!
 fn main() {
-    let mut messages = [""; message::LENGTH];
+    let mut messages = [""; message::QUANTITY];
     let mut index = 0;
     collect_messages(&mut messages, &mut index);
     messages[0..index].into_iter().for_each(|message| {
