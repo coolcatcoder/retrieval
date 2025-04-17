@@ -60,6 +60,8 @@ fn module_from_trait(trait_ident: &impl ToString) -> Ident {
 /// #[retrieve(1000)]
 /// trait Empty {}
 /// ```
+/// 
+/// TODO: Document the generated module.
 #[proc_macro_attribute]
 pub fn retrieve(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemTrait);
@@ -227,8 +229,23 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     Ok(output)
 }
 
-/// Converts a function into one that iterates over every implementation of a trait.
-/// TODO: Document this better.
+/// Place on a generic function to convert it into a non-generic function that iterates through all implementations of a [retrieval trait](macro@retrieve).  
+/// Due to [an issue](https://github.com/coolcatcoder/retrieval/issues/7) the function must have only one generic with only one trait bound.
+/// ```rust
+/// #[iterate]
+/// const fn collect_messages<T: Message>(messages: &mut [&str], index: &mut usize) {
+///     messages[*index] = T::STR;
+///     *index += 1;
+/// }
+///
+/// const MESSAGES: [&str; message::LENGTH] = {
+///     let mut messages = [""; message::LENGTH];
+///     let mut index = 0;
+///
+///     collect_messages(&mut messages, &mut index);
+///     messages
+/// };
+/// ```
 #[proc_macro_attribute]
 pub fn iterate(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemFn);

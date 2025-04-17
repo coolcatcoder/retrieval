@@ -1,6 +1,6 @@
 use retrieval::prelude::*;
 
-#[retrieve]
+#[retrieve(10)]
 trait Message {
     const STR: &str = "";
 }
@@ -17,7 +17,7 @@ impl Different {
     type Blah = ();
     type Two = i32;
     fn bubble() {
-        println!("bubble");
+        println!("Bubble!!");
     }
 }
 
