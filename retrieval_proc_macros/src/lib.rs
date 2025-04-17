@@ -146,7 +146,13 @@ fn generate_switches(amount: u32) -> TokenStream {
     output
 }
 
-/// TODO: Document this better.
+/// Place on an inherent impl of a [retrieval trait](macro@retrieve) in order to send it for retrieval.
+/// ```
+/// #[send]
+/// impl Message {
+///     const STR: &str = "Hello world!";
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn send(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemImpl);
@@ -246,6 +252,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 ///     messages
 /// };
 /// ```
+/// TODO: Document the recursion limit.
 #[proc_macro_attribute]
 pub fn iterate(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemFn);
