@@ -54,9 +54,10 @@ fn module_internal_from_trait(trait_ident: &impl ToString) -> Ident {
 /// 
 /// Due to how this works internally, there are a few restrictions:  
 /// This has to be done in the crate root currently.  
-/// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)
+/// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)  
+/// You can only have a max of 5 retrieval traits in 1 crate. (If you need more than 5, then please raise an issue on github!)
 /// ```rust
-/// #[retrieve(capacity=5)]
+/// #[retrieve(capacity=10)]
 /// trait Message {
 ///     const STR: &str = "";
 /// }
