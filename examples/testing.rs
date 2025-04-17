@@ -9,12 +9,21 @@ trait Message {
 trait Different {
     type Blah = ();
     type Two = ();
+    fn bubble() {}
 }
 
 #[send]
 impl Different {
     type Blah = ();
     type Two = i32;
+    fn bubble() {
+        println!("bubble");
+    }
+}
+
+#[iterate]
+fn do_bubble<B: Different>() {
+    B::bubble();
 }
 
 #[iterate]
@@ -48,6 +57,7 @@ fn main() {
     messages[0..index].into_iter().for_each(|message| {
         println!("{}", message);
     });
+    do_bubble();
 }
 
 mod grah {

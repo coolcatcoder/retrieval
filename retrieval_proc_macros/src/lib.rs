@@ -38,9 +38,28 @@ fn module_from_trait(trait_ident: &impl ToString) -> Ident {
     )
 }
 
-/// Place on a trait to turn it into a retrieval trait.
-/// This has to be done in the crate root currently. Everything else can be used anywhere.
-/// TODO: Document this better.
+/// Place on a trait to turn it into a retrieval trait, which is capable of collecting implementations.  
+/// Optionally allows the capacity to be specified. Defaults to 1000. The higher the capacity, the longer it will take to compile.
+/// 
+/// Due to how this works internally, there are a few restrictions:  
+/// This has to be done in the crate root currently.  
+/// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)
+/// 
+/// ```rust
+/// #[retrieve(capacity=5)]
+/// trait Message {
+///     const STR: &str = "";
+/// }
+///
+/// #[retrieve]
+/// trait Something {
+///     type Blah = ();
+///     fn bubble() {}
+/// }
+///
+/// #[retrieve(1000)]
+/// trait Empty {}
+/// ```
 #[proc_macro_attribute]
 pub fn retrieve(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemTrait);
@@ -61,9 +80,7 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             return None;
         };
 
-        let Some(default) = item.default.take() else {
-            return None;
-        };
+        let default = item.default.take()?;
         let ident = &item.ident;
         let default_type = default.1;
 
@@ -233,6 +250,7 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
     }
 
     let generic = internal.sig.generics.type_params().next().unwrap();
+    let generic_ident = &generic.ident;
     let syn::TypeParamBound::Trait(trait_bound) = generic.bounds.first().unwrap() else {
         return Err(syn::Error::new(
             generic.bounds.span(),
@@ -247,8 +265,6 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
         .last()
         .unwrap()
         .ident);
-
-    let generic_ident = &generic.ident;
 
     // Create the external function's signature from the internal's but without the generics.
     let mut external_sig = internal.sig.clone();
@@ -299,7 +315,7 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
             Span::call_site(),
         );
         internal.block.stmts.push(syn::parse2(
-            quote! {#internal_next_ident::<T::NEXT>(#(#inputs),*);},
+            quote! {#internal_next_ident::<#generic_ident::NEXT>(#(#inputs),*);},
         )?);
 
         output.extend(quote!{#internal});
