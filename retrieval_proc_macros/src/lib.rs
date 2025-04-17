@@ -28,12 +28,21 @@ impl<const DEFAULT: u32> Parse for NumberAttribute<DEFAULT> {
     }
 }
 
-/// Gets the internal module ident from the trait ident.
-fn module_from_trait(trait_ident: &impl ToString) -> Ident {
+/// Gets the public module ident from the trait ident.
+fn module_public_from_trait(trait_ident: &impl ToString) -> Ident {
     Ident::new(
         &trait_ident
             .to_string()
             .to_lowercase(),
+        Span::call_site(),
+    )
+}
+
+/// Gets the internal module ident from the trait ident.
+fn module_internal_from_trait(trait_ident: &impl ToString) -> Ident {
+    Ident::new(&format!("__internal_{}",trait_ident
+            .to_string()
+            .to_lowercase()),
         Span::call_site(),
     )
 }
@@ -73,7 +82,8 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     let capacity = syn::parse2::<NumberAttribute::<1000>>(input)?.0;
 
     let trait_ident = &item.ident;
-    let module_ident = module_from_trait(trait_ident);
+    let module_public_ident = module_public_from_trait(trait_ident);
+    let module_internal_ident = module_internal_from_trait(trait_ident);
 
     // Associated types aren't allowed defaults, so we remove them, and pass the default to our initial implementation.
     let default_types: Vec<TokenStream> = item.items.iter_mut().filter_map(|item| {
@@ -102,22 +112,26 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     let output = quote! {
         #item
 
-        mod #module_ident {
-            /// The final implementation.
-            /// Only implemented once, at the end.
-            #[doc(hidden)]
-            pub trait Final {}
-
+        /// Contains information related to the retrieval trait of the same name.
+        mod #module_public_ident {
             /// The amount of implementations of this trait.
             pub const QUANTITY: usize = {
                 const fn get_quantity<const INDEX: usize>() -> usize
                 where
-                    retrieval::Container<INDEX>: Final,
+                    retrieval::Container<INDEX>: super::#module_internal_ident::Final,
                 {
                     INDEX
                 }
                 get_quantity()
             };
+        }
+
+        #[doc(hidden)]
+        mod #module_internal_ident {
+            /// The final implementation.
+            /// Only implemented once, at the end.
+            #[doc(hidden)]
+            pub trait Final {}
 
             #switches
         }
@@ -127,9 +141,9 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             type NEXT = Self;
             const END: bool = true;
         }
-        impl #module_ident::Final for retrieval::Container<0>
+        impl #module_internal_ident::Final for retrieval::Container<0>
         where
-            for<'a> #module_ident::Switch0: core::marker::Unpin,
+            for<'a> #module_internal_ident::Switch0: core::marker::Unpin,
         {}
     };
 
@@ -212,10 +226,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
         syn::parse2(self_ty.to_token_stream())?,
         Default::default(),
     ));
-    let mod_ident = Ident::new(
-        &self_ty.to_token_stream().to_string().to_lowercase(),
-        Span::call_site(),
-    );
+    let mod_internal_ident = module_internal_from_trait(&self_ty.to_token_stream());
 
     item.items.push(ImplItem::Verbatim(quote! {
         type NEXT = retrieval::Container<#index_previous>;
@@ -227,10 +238,10 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     let output = quote! {
         #item
 
-        impl core::marker::Unpin for crate::#mod_ident::#switch_previous where for<'a> [()]: Sized {}
-        impl crate::#mod_ident::Final for retrieval::Container<#index_current>
+        impl core::marker::Unpin for crate::#mod_internal_ident::#switch_previous where for<'a> [()]: Sized {}
+        impl crate::#mod_internal_ident::Final for retrieval::Container<#index_current>
         where
-            for<'a> crate::#mod_ident::#switch_current: core::marker::Unpin,
+            for<'a> crate::#mod_internal_ident::#switch_current: core::marker::Unpin,
         {}
     };
 
@@ -286,7 +297,7 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
     };
 
     // Get the module from the last segment of the trait bound.
-    let module_ident = module_from_trait(&trait_bound
+    let module_public_ident = module_public_from_trait(&trait_bound
         .path
         .segments
         .last()
@@ -313,7 +324,7 @@ fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenSt
 
     let mut output = quote! {
         #external_sig {
-            #internal_start_ident::<retrieval::Container<{crate::#module_ident::QUANTITY}>>(#(#inputs),*);
+            #internal_start_ident::<retrieval::Container<{crate::#module_public_ident::QUANTITY}>>(#(#inputs),*);
         }
     };
 
