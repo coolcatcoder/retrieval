@@ -41,10 +41,11 @@ fn module_from_trait(trait_ident: &impl ToString) -> Ident {
 /// Place on a trait to turn it into a retrieval trait, which is capable of collecting implementations.  
 /// Optionally allows the capacity to be specified. Defaults to 1000. The higher the capacity, the longer it will take to compile.
 /// 
+/// Generates a module that has the name of the trait but in in lowercase. It contains the QUANTITY of implementations along with a few implementation details.
+/// 
 /// Due to how this works internally, there are a few restrictions:  
 /// This has to be done in the crate root currently.  
 /// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)
-/// 
 /// ```rust
 /// #[retrieve(capacity=5)]
 /// trait Message {
@@ -60,8 +61,6 @@ fn module_from_trait(trait_ident: &impl ToString) -> Ident {
 /// #[retrieve(1000)]
 /// trait Empty {}
 /// ```
-/// 
-/// TODO: Document the generated module.
 #[proc_macro_attribute]
 pub fn retrieve(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemTrait);
@@ -236,6 +235,8 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 }
 
 /// Place on a generic function to convert it into a non-generic function that iterates through all implementations of a [retrieval trait](macro@retrieve).  
+/// Optionally allows the capacity to be specified. Defaults to 128. The higher the capacity, the longer it will take to compile.
+/// 
 /// Due to [an issue](https://github.com/coolcatcoder/retrieval/issues/7) the function must have only one generic with only one trait bound.
 /// ```rust
 /// #[iterate]
@@ -252,7 +253,6 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 ///     messages
 /// };
 /// ```
-/// TODO: Document the recursion limit.
 #[proc_macro_attribute]
 pub fn iterate(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemFn);

@@ -6,6 +6,7 @@ pub mod prelude {
     pub use super::{iterate, retrieve, send};
 }
 
+#[doc(hidden)]
 pub struct Container<const INDEX: usize>;
 
 // #[cfg(test)]
