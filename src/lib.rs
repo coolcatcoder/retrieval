@@ -94,9 +94,10 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
 
             let default = item.default.take()?;
             let ident = &item.ident;
+            let generics = &item.generics;
             let default_type = default.1;
 
-            Some(quote! {type #ident = #default_type;})
+            Some(quote! {type #ident #generics = #default_type;})
         })
         .collect();
 
@@ -223,7 +224,10 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     let Some(index) = index else {
         return Err(syn::Error::new(
             item.self_ty.span(),
-            format!("Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.\n{:?}", TRAIT_COUNTERS),
+            format!(
+                "Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.\n{:?}",
+                TRAIT_COUNTERS
+            ),
         ));
     };
 

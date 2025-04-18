@@ -1,3 +1,5 @@
+//! Tests that 2 implementations can fit in a capacity of 2.
+
 use retrieval::*;
 
 #[retrieve(2)]
@@ -10,6 +12,8 @@ const fn testing<T: Number>() {
     assert!((T::NUMBER == 5) || (T::NUMBER == 112));
 }
 
+const _: () = testing();
+
 #[send]
 impl Number {
     const NUMBER: u8 = 5;
@@ -18,9 +22,4 @@ impl Number {
 #[send]
 impl Number {
     const NUMBER: u8 = 112;
-}
-
-#[test]
-fn main() {
-    testing();
 }
