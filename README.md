@@ -1,7 +1,34 @@
 Allows the retrieval of trait implementations.
+## Example
+```rust
+use retrieval::*;
 
+#[retrieve]
+trait Message {
+    const STR: &str = "";
+}
+
+#[iterate]
+fn collect_messages<T: Message>() {
+    println!("{}", T::STR);
+}
+
+#[send]
+impl Message {
+    const STR: &str = "Hello world!";
+}
+
+fn main() {
+    // Will print "Hello world!", and "Hello again!".
+    collect_messages();
+}
+
+#[send]
+impl Message {
+    const STR: &str = "Hello again!";
+}
+```
 ## Explanation
-
 Imagine if you could store a list of types, consts, and functions, all at compile time.
 There are various ways of accomplishing that, but now what if instead you could automatically generate that list from desired items located anywhere in your crate?
 It is possible, using this crate.
