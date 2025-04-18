@@ -1,3 +1,5 @@
+//! Tests any random nonsense.
+
 use retrieval::*;
 
 #[retrieve(10)]
