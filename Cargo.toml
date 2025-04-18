@@ -2,6 +2,11 @@
 name = "retrieval"
 version = "0.1.0"
 edition = "2024"
+description = "Allows the retrieval of trait implementations."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/coolcatcoder/retrieval"
+keywords = ["linkage","registration"]
+categories = ["rust-patterns", "no-std", "no-std::no-alloc"]
 
 [lib]
 proc-macro = true
