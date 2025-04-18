@@ -7,6 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/coolcatcoder/retrieval"
 keywords = ["linkage","registration"]
 categories = ["rust-patterns", "no-std", "no-std::no-alloc"]
+readme = "README.md"
 
 [lib]
 proc-macro = true

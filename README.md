@@ -2,7 +2,7 @@ Allows the retrieval of trait implementations.
 
 Still very much a work in progress.
 
-## Explanation of this Madness
+## Explanation
 
 Imagine if you could store a list of types, consts, and functions, all at compile time.
 There are various ways of accomplishing that, but now what if instead you could automatically generate that list from desired items located anywhere in your crate?
@@ -109,9 +109,9 @@ This may not work with proc macro caching, and in fact could stop working at any
 Licensed under either of
 
  * Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+   ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
  * MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+   ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
