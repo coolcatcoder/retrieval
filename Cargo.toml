@@ -1,11 +1,12 @@
-[workspace]
-members = ["retrieval_proc_macros"]
-
 [package]
 name = "retrieval"
 version = "0.1.0"
 edition = "2024"
-license = "MIT OR Apache-2.0"
+
+[lib]
+proc-macro = true
 
 [dependencies]
-retrieval_proc_macros = {version = "0.1.0", path = "retrieval_proc_macros"}
+syn = {version = "2.0", features = ["full"]}
+quote = "1.0"
+proc-macro2 = "1.0"

@@ -1,4 +1,4 @@
-use retrieval::prelude::*;
+use retrieval::*;
 
 #[retrieve(10)]
 trait Message {
@@ -62,7 +62,7 @@ fn main() {
 
 mod grah {
     use crate::{Different, Message};
-    use retrieval_proc_macros::{iterate, send};
+    use retrieval::*;
 
     #[send]
     impl Message {

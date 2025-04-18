@@ -15,12 +15,12 @@ impl Message {
     const STR: &str = "Hello world!";
 }
 
-fn main() {
-    // Will print "Hello world!", and "Hello again!".
-    collect_messages();
-}
-
 #[send]
 impl Message {
     const STR: &str = "Hello again!";
+}
+
+fn main() {
+    // Will print "Hello world!", and "Hello again!".
+    collect_messages();
 }
