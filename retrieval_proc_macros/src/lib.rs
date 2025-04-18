@@ -250,7 +250,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 }
 
 /// Place on a generic function to convert it into a non-generic function that iterates through all implementations of a [retrieval trait](macro@retrieve).  
-/// Optionally allows the capacity to be specified. Defaults to 128. The higher the capacity, the longer it will take to compile.
+/// Optionally allows the capacity to be specified. Defaults to 1000. The higher the capacity, the longer it will take to compile.
 /// 
 /// Due to [an issue](https://github.com/coolcatcoder/retrieval/issues/7) the function must have only one generic with only one trait bound.
 /// ```rust
@@ -278,7 +278,7 @@ pub fn iterate(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
 
 fn iterate_internal(input: TokenStream, internal: ItemFn) -> syn::Result<TokenStream> {
     // Work out how many functions we will need to reach the target recursion limit.
-    let recursion_limit = syn::parse2::<NumberAttribute::<128>>(input)?.0;
+    let recursion_limit = syn::parse2::<NumberAttribute::<1000>>(input)?.0;
     let functions_needed = recursion_limit.div_ceil(128);
 
     if internal.sig.generics.params.len() != 1 {
