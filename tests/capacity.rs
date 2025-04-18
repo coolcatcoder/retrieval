@@ -1,26 +1,26 @@
 use retrieval::*;
 
-#[retrieve]
-trait Message {
-    const STR: &str = "";
+#[retrieve(2)]
+trait Number {
+    const NUMBER: u8 = 0;
 }
 
-#[iterate]
-fn collect_messages<T: Message>() {
-    println!("{}", T::STR);
-}
-
-#[send]
-impl Message {
-    const STR: &str = "Hello world!";
+#[iterate(2)]
+const fn testing<T: Number>() {
+    assert!((T::NUMBER == 5) || (T::NUMBER == 112));
 }
 
 #[send]
-impl Message {
-    const STR: &str = "Hello again!";
+impl Number {
+    const NUMBER: u8 = 5;
 }
 
+#[send]
+impl Number {
+    const NUMBER: u8 = 112;
+}
+
+#[test]
 fn main() {
-    // Will print "Hello world!", and "Hello again!".
-    collect_messages();
+    testing();
 }

@@ -223,7 +223,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     let Some(index) = index else {
         return Err(syn::Error::new(
             item.self_ty.span(),
-            "Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.",
+            format!("Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.\n{:?}", TRAIT_COUNTERS),
         ));
     };
 
