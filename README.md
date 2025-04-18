@@ -1,7 +1,5 @@
 Allows the retrieval of trait implementations.
 
-Still very much a work in progress.
-
 ## Explanation
 
 Imagine if you could store a list of types, consts, and functions, all at compile time.
