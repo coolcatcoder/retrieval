@@ -6,7 +6,7 @@ impl Number {
     const N: u8 = 5;
 }
 
-mod blah {
+pub mod blah {
     use crate::Number;
     use retrieval::send;
 
@@ -15,13 +15,21 @@ mod blah {
         const N: u8 = 6;
     }
 
-    mod blah {
-        use crate::Number;
-        use retrieval::send;
+    pub mod blah {
+        use retrieval::{iterate, send};
 
         #[send]
-        impl Number {
+        impl crate::Number {
             const N: u8 = 7;
+        }
+
+        #[iterate]
+        pub const fn collect_messages_other<T: crate::Number>(
+            messages: &mut [u8],
+            index: &mut usize,
+        ) {
+            messages[*index] = T::N;
+            *index += 1;
         }
     }
 }

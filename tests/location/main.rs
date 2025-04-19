@@ -6,6 +6,14 @@ use retrieval::*;
 
 mod other;
 
+trait Cake {}
+pub struct RedVelvet;
+impl Cake for RedVelvet {}
+#[retrieve]
+trait Something {
+    type Has: Cake = RedVelvet;
+}
+
 #[retrieve]
 trait Number {
     const N: u8 = 0;
@@ -19,12 +27,17 @@ const fn collect_messages<T: Number>(messages: &mut [u8], index: &mut usize) {
 
 #[test]
 fn main() {
-    let mut messages = [0; number::QUANTITY];
+    let mut messages = [0; Number::QUANTITY];
     let mut index = 0;
     collect_messages(&mut messages, &mut index);
 
+    let mut other_messages = [0; Number::QUANTITY];
+    let mut other_index = 0;
+    other::blah::blah::collect_messages_other(&mut other_messages, &mut other_index);
+
     [1, 2, 3, 4, 5, 6, 7, 8].iter().for_each(|value| {
         assert!(messages.contains(value));
+        assert!(other_messages.contains(value));
     });
 }
 
