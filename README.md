@@ -1,7 +1,7 @@
 Allows the retrieval of trait implementations.  
 [Documentation](https://docs.rs/retrieval/)  
 [Crate](https://crates.io/crates/retrieval)  
-[Change Log](./CHANGELOG.md)
+[Change Log](https://github.com/coolcatcoder/retrieval/blob/master/CHANGELOG.md)
 ## Example
 ```rust
 use retrieval::*;
