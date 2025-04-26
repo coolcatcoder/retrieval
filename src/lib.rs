@@ -168,6 +168,48 @@ fn generate_switches(amount: u32) -> TokenStream {
     output
 }
 
+/// A single counter of trait implementations.
+/// Tells traits apart using the crate name and the trait name.
+struct TraitCounter {
+    crate_name: String,
+    trait_name: String,
+
+    counter: AtomicU32,
+}
+
+/// No deadlock way of counting trait implementations.
+struct TraitCounters([OnceLock<TraitCounter>; 5], OnceLock<Box<TraitCounters>>);
+
+impl TraitCounters {
+    const fn new() -> Self {
+        Self([const { OnceLock::new() }; 5], OnceLock::new())
+    }
+
+    fn get(&self, trait_name: String) -> Result<u32, std::env::VarError> {
+        let crate_name: String = std::env::var("CARGO_CRATE_NAME")?;
+
+        Ok(self.get_internal(crate_name, trait_name))
+    }
+
+    fn get_internal(&self, crate_name: String, trait_name: String) -> u32 {
+        for trait_counter in &self.0 {
+            let trait_counter = trait_counter.get_or_init(|| TraitCounter {
+                crate_name: crate_name.clone(),
+                trait_name: trait_name.clone(),
+
+                counter: AtomicU32::new(0),
+            });
+
+            if trait_counter.crate_name == crate_name && trait_counter.trait_name == trait_name {
+                return trait_counter.counter.fetch_add(1, Ordering::Relaxed);
+            }
+        }
+
+        let next = self.1.get_or_init(|| Box::new(TraitCounters::new()));
+        next.get_internal(crate_name, trait_name)
+    }
+}
+
 /// Place on an inherent impl of a [retrieval trait](macro@retrieve) in order to send it for retrieval.
 /// ```
 /// # use retrieval::*;
@@ -200,8 +242,7 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 
     // Sadly the only way I know of counting...
     // TODO: A max of 5 traits? That sucks.
-    static TRAIT_COUNTERS: [(AtomicU32, OnceLock<String>); 5] =
-        [const { (AtomicU32::new(0), OnceLock::new()) }; 5];
+    static TRAIT_COUNTERS: TraitCounters = TraitCounters::new();
 
     let Type::Path(trait_path) = &*item.self_ty else {
         return Err(syn::Error::new(
@@ -211,23 +252,8 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     };
     let trait_path = trait_path.path.clone();
     let trait_ident_string = trait_path.segments.last().unwrap().ident.to_string();
-    let mut index = None;
-    for (maybe_index, ident) in TRAIT_COUNTERS.iter() {
-        let ident = ident.get_or_init(|| trait_ident_string.clone());
-        if *ident == trait_ident_string {
-            index = Some(maybe_index.fetch_add(1, Ordering::Relaxed));
-            break;
-        }
-    }
-
-    let Some(index) = index else {
-        return Err(syn::Error::new(
-            item.self_ty.span(),
-            format!(
-                "Something went wrong with the proc macro atomics.\nI'm sorry.\nDid you try use more than 5 traits? We don't support that.\n{:?}",
-                TRAIT_COUNTERS
-            ),
-        ));
+    let Ok(index) = TRAIT_COUNTERS.get(trait_ident_string) else {
+        return Err(syn::Error::new(input.span(), "Could not get crate name."));
     };
 
     let index_previous = LitInt::new(&(index).to_string(), Span::call_site());
