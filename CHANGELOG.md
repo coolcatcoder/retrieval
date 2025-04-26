@@ -1,7 +1,7 @@
-# 0.2.0 (unreleased)
+# 0.2.0
 ## Changed
 - The retrieve macro can be called anywhere.
-- Turned the retrieval trait into a module that contains the Trait and QUANTITY.
+- (BREAKING) Turned the retrieval trait into a module that contains the Trait and QUANTITY.
 ## Removed
 - No longer reliant on compiler bugs! (Updated the explanation example to use the new techniques.)
 - Removed the limit of 5 retrieval traits.
