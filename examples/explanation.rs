@@ -1,7 +1,5 @@
 //! This example shows how this crate works and what it roughly expands to.
 
-use std::marker::PhantomData;
-
 /// Contains the retrieved implementations.
 /// Each implementation is stored under a different INDEX.
 struct Container<const INDEX: usize>;
@@ -41,9 +39,9 @@ const LENGTH: usize = {
 // Basically by implementing Unpin for Switch0<T, false>, then Switch0<T, true> is no longer Unpin.
 // T is simply so we can avoid using trivial bounds which aren't allowed.
 // Also, because we do not know how many implementations we are going to collect, we generate 1000 switches by default.
-struct Switch0<T, const BOOL: bool>(PhantomData<T>);
-struct Switch1<T, const BOOL: bool>(PhantomData<T>);
-struct Switch2<T, const BOOL: bool>(PhantomData<T>);
+struct Switch0<T, const BOOL: bool>(core::marker::PhantomData<T>);
+struct Switch1<T, const BOOL: bool>(core::marker::PhantomData<T>);
+struct Switch2<T, const BOOL: bool>(core::marker::PhantomData<T>);
 
 // The required 0th implementation, so that we know once we have iterated over every implementation.
 impl Message for Container<0> {

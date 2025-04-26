@@ -39,8 +39,10 @@ It is possible, using this crate.
 How? Simple, we create a trait that holds the items we want to collect. Then we use an attribute proc macro, that you put on each trait implementation containing the items you want to send to the list.  
 Every invocation of the attribute proc macro assumes that it is the last. When it gets invoked again, it simply unimplements the last invocation.
 
-Here is roughly an example of the techniques we use for this: [Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024&gist=575d81e8174d148d03a9ac906be03b60)
+Here is roughly an example of the techniques we use for this: [Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024&gist=073de8e13ce32c13e0ef03476b4096ea)
 ```rust
+//! This example shows how this crate works and what it roughly expands to.
+
 /// Contains the retrieved implementations.
 /// Each implementation is stored under a different INDEX.
 struct Container<const INDEX: usize>;
@@ -55,6 +57,11 @@ trait Message {
     /// Is this the end of the chain?
     const END: bool = false;
 }
+
+/// Self is the same type as T.
+/// Used to bypass trivial bounds.
+trait Is<T> {}
+impl<T> Is<T> for T {}
 
 /// The final implementation.
 /// Only implemented once on Container<INDEX>, at the highest INDEX that implements Message.
@@ -72,19 +79,20 @@ const LENGTH: usize = {
 };
 
 // Switches allow us to perform a slightly modified auto trait specialisation. (https://github.com/coolcatcoder/rust_techniques/issues/1)
-// Basically by implementing Unpin for Switch0<false>, then Switch0<true> is no longer Unpin.
+// Basically by implementing Unpin for Switch0<T, false>, then Switch0<T, true> is no longer Unpin.
+// T is simply so we can avoid using trivial bounds which aren't allowed.
 // Also, because we do not know how many implementations we are going to collect, we generate 1000 switches by default.
-struct Switch0<const BOOL: bool>;
-struct Switch1<const BOOL: bool>;
-struct Switch2<const BOOL: bool>;
+struct Switch0<T, const BOOL: bool>(core::marker::PhantomData<T>);
+struct Switch1<T, const BOOL: bool>(core::marker::PhantomData<T>);
+struct Switch2<T, const BOOL: bool>(core::marker::PhantomData<T>);
 
 // The required 0th implementation, so that we know once we have iterated over every implementation.
 impl Message for Container<0> {
     type NEXT = Self;
     const END: bool = true;
 }
-// Mark INDEX 0 as the final implemention, but only when Switch0<true> implements unpin.
-impl Final for Container<0> where for<'a> Switch0<true>: Unpin {}
+// Mark INDEX 0 as the final implemention, but only when Switch0<T, true> implements unpin.
+impl<T: Is<Container<0>>> Final for T where Switch0<T, true>: Unpin {}
 
 /// Recursively iterate each Message implementation.
 fn __internal_collect_messages<T: Message>() {
@@ -106,11 +114,11 @@ impl Message for Container<1> {
     const STR: &str = "Hello world!";
     type NEXT = Container<0>;
 }
-// By implementing Unpin for Switch0<false> we cause Switch0<true> to not implement Unpin.
+// By implementing Unpin for Switch0<T, false> we cause Switch0<T, true> to not implement Unpin.
 // This causes Container<0> to no longer be marked as Final.
-impl Unpin for Switch0<false> {}
-// Mark INDEX 1 as the final implemention, but only when Switch1<true> implements unpin.
-impl Final for Container<1> where for<'a> Switch1<true>: Unpin {}
+impl<T> Unpin for Switch0<T, false> {}
+// Mark INDEX 1 as the final implemention, but only when Switch1<T, true> implements unpin.
+impl<T: Is<Container<1>>> Final for T where Switch1<T, true>: Unpin {}
 
 /// The entry point to the program.
 /// Simply calls our collect_messages function in order to print every collected message.
@@ -123,13 +131,13 @@ impl Message for Container<2> {
     const STR: &str = "Hello again!";
     type NEXT = Container<1>;
 }
-// By implementing Unpin for Switch1<false> we cause Switch1<true> to not implement Unpin.
+// By implementing Unpin for Switch1<T, false> we cause Switch1<T, true> to not implement Unpin.
 // This causes Container<1> to no longer be marked as Final.
-impl Unpin for Switch1<false> {}
-// Mark INDEX 2 as the final implemention, but only when Switch2<true> implements unpin.
-impl Final for Container<2> where for<'a> Switch2<true>: Unpin {}
+impl<T> Unpin for Switch1<T, false> {}
+// Mark INDEX 2 as the final implemention, but only when Switch2<T, true> implements unpin.
+impl<T: Is<Container<2>>> Final for T where Switch2<T, true>: Unpin {}
 ```
-This unfortunately does require us to be able to count in the proc macro, which sadly means we have to use static abuse...
+This unfortunately does require us to be able to count in the proc macro, which sadly means we have to use statics...
 This may not work with proc macro caching, and in fact could stop working at any moment. We are hopeful that rust will add proper state to proc macros before they break this trick.
 
 ## License
