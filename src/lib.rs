@@ -125,6 +125,11 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             ///
             /// Contains internal implementation details.
             pub mod __internal {
+                /// Self is the same type as T.
+                /// Used to bypass trivial bounds.
+                pub trait Is<T> {}
+                impl<T> Is<T> for T {}
+
                 /// The final implementation.
                 /// Only implemented once, at the end.
                 pub trait Final {}
@@ -143,9 +148,8 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             type NEXT = Self;
             const END: bool = true;
         }
-        impl #trait_ident::__internal::Final for #trait_ident::__internal::Container<0>
-        where
-            for<'a> #trait_ident::__internal::Switch0: core::marker::Unpin,
+        impl<T: #trait_ident::__internal::Is<#trait_ident::__internal::Container<0>>> #trait_ident::__internal::Final for T
+        where #trait_ident::__internal::Switch0<T, true>: core::marker::Unpin,
         {}
     };
 
@@ -158,7 +162,7 @@ fn generate_switches(amount: u32) -> TokenStream {
         let ident = Ident::new(&format!("Switch{index}"), Span::call_site());
         output.extend(quote! {
             #[doc(hidden)]
-            pub struct #ident;
+            pub struct #ident<T, const BOOL: bool>(core::marker::PhantomData<T>);
         });
     });
     output
@@ -247,10 +251,9 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
     let output = quote! {
         #item
 
-        impl core::marker::Unpin for #trait_path::__internal::#switch_previous where for<'a> [()]: Sized {}
-        impl #trait_path::__internal::Final for #trait_path::__internal::Container<#index_current>
-        where
-            for<'a> #trait_path::__internal::#switch_current: core::marker::Unpin,
+        impl<T> core::marker::Unpin for #trait_path::__internal::#switch_previous<T, false> {}
+        impl<T: #trait_path::__internal::Is<#trait_path::__internal::Container<#index_current>>> #trait_path::__internal::Final for T
+        where #trait_path::__internal::#switch_current<T, true>: core::marker::Unpin,
         {}
     };
 
