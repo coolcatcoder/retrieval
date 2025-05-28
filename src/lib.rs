@@ -1,15 +1,14 @@
 #![doc = include_str!("../README.md")]
+#![deny(clippy::unwrap_used)]
+#![warn(clippy::pedantic)]
 
 use proc_macro::TokenStream as StdTokenStream;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use std::sync::{
-    OnceLock,
-    atomic::{AtomicU32, Ordering},
-};
+use std::env::VarError;
 use syn::{
-    FnArg, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, Pat, Stmt, Token, TraitItem, Type,
-    Visibility, parse::Parse, parse_macro_input, spanned::Spanned,
+    FnArg, Generics, Ident, ImplItem, ItemFn, ItemImpl, ItemTrait, LitInt, Pat, Path, Stmt, Token,
+    TraitItem, Type, Visibility, parse::Parse, parse_macro_input, spanned::Spanned,
 };
 
 /// Allows a number in the attribute, or goes with a default.
@@ -31,14 +30,17 @@ impl<const DEFAULT: u32> Parse for NumberAttribute<DEFAULT> {
     }
 }
 
-/// Place on a trait to turn it into a retrieval trait, which is capable of collecting implementations.  
+fn internal_path(trait_path: &Path) -> Result<Path, syn::Error> {
+    syn::parse2(quote! {#trait_path::__internal})
+}
+
+/// Place on a trait to turn it into a retrieval trait, which is capable of collecting implementations.\
 /// Optionally allows the capacity to be specified. Defaults to 1000. The higher the capacity, the longer it will take to compile.
 ///
 /// The trait becomes a module. It contains the QUANTITY of implementations as well as the actual Trait.
 ///
-/// Due to how this works internally, there are a few restrictions:  
-/// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)  
-/// You can only have a max of 5 retrieval traits in 1 crate. (If you need more than 5, then please raise an issue on github!)
+/// Due to how this works internally, there are a few restrictions:\
+/// All associated items must have a default. (Allows associated types to have defaults, which would normally not be allowed.)
 /// ```rust
 /// # use retrieval::retrieve;
 /// # fn main() {}
@@ -46,7 +48,7 @@ impl<const DEFAULT: u32> Parse for NumberAttribute<DEFAULT> {
 /// trait Message {
 ///     const STR: &str = "";
 /// }
-/// const MESSAGE_QUANTITY: usize = Message::QUANTITY;
+/// const MESSAGE_QUANTITY: u16 = Message::QUANTITY;
 ///
 /// #[retrieve]
 /// trait Something {
@@ -69,7 +71,7 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     let capacity = syn::parse2::<NumberAttribute<1000>>(input)?.0;
 
     let trait_ident = std::mem::replace(&mut item.ident, Ident::new("Trait", Span::call_site()));
-    let trait_vis = std::mem::replace(&mut item.vis, Visibility::Public(Default::default()));
+    let trait_vis = std::mem::replace(&mut item.vis, Visibility::Public(<Token![pub]>::default()));
 
     // Associated types aren't allowed defaults, so we remove them, and pass the default to our initial implementation.
     let default_types: Vec<TokenStream> = item
@@ -98,7 +100,14 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
     }));
 
     // One extra for the one required impl.
-    let switches = generate_switches(capacity + 1);
+    let setup = replaceable_implementations::setup(capacity + 1);
+    let path_to_setup: Path = syn::parse2(quote! {#trait_ident::__internal})?;
+    let initial_implementation = replaceable_implementations::initial_implementation(
+        &path_to_setup,
+        syn::parse2(quote! {
+            impl #trait_ident::__internal::Final for #trait_ident::__internal::Container<0> {}
+        })?,
+    )?;
 
     let output = quote! {
         #[allow(non_snake_case)]
@@ -109,8 +118,8 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             #item
 
             /// The amount of implementations of this trait.
-            pub const QUANTITY: usize = {
-                const fn get_quantity<const INDEX: usize>() -> usize
+            pub const QUANTITY: u16 = {
+                const fn get_quantity<const INDEX: u16>() -> u16
                 where
                     __internal::Container<INDEX>: __internal::Final,
                 {
@@ -125,20 +134,15 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             ///
             /// Contains internal implementation details.
             pub mod __internal {
-                /// Self is the same type as T.
-                /// Used to bypass trivial bounds.
-                pub trait Is<T> {}
-                impl<T> Is<T> for T {}
-
                 /// The final implementation.
                 /// Only implemented once, at the end.
                 pub trait Final {}
 
                 /// Contains the retrieved implementations.
                 /// Each implementation is stored under a different INDEX.
-                pub struct Container<const INDEX: usize>;
+                pub struct Container<const INDEX: u16>;
 
-                #switches
+                #setup
             }
         }
 
@@ -148,66 +152,10 @@ fn retrieve_internal(input: TokenStream, mut item: ItemTrait) -> syn::Result<Tok
             type NEXT = Self;
             const END: bool = true;
         }
-        impl<T: #trait_ident::__internal::Is<#trait_ident::__internal::Container<0>>> #trait_ident::__internal::Final for T
-        where #trait_ident::__internal::Switch0<T, true>: core::marker::Unpin,
-        {}
+        #initial_implementation
     };
 
     Ok(output)
-}
-
-fn generate_switches(amount: u32) -> TokenStream {
-    let mut output = TokenStream::new();
-    (0..amount).for_each(|index| {
-        let ident = Ident::new(&format!("Switch{index}"), Span::call_site());
-        output.extend(quote! {
-            #[doc(hidden)]
-            pub struct #ident<T, const BOOL: bool>(core::marker::PhantomData<T>);
-        });
-    });
-    output
-}
-
-/// A single counter of trait implementations.
-/// Tells traits apart using the crate name and the trait name.
-struct TraitCounter {
-    crate_name: String,
-    trait_name: String,
-
-    counter: AtomicU32,
-}
-
-/// No deadlock way of counting trait implementations.
-struct TraitCounters([OnceLock<TraitCounter>; 5], OnceLock<Box<TraitCounters>>);
-
-impl TraitCounters {
-    const fn new() -> Self {
-        Self([const { OnceLock::new() }; 5], OnceLock::new())
-    }
-
-    fn get(&self, trait_name: String) -> Result<u32, std::env::VarError> {
-        let crate_name: String = std::env::var("CARGO_CRATE_NAME")?;
-
-        Ok(self.get_internal(crate_name, trait_name))
-    }
-
-    fn get_internal(&self, crate_name: String, trait_name: String) -> u32 {
-        for trait_counter in &self.0 {
-            let trait_counter = trait_counter.get_or_init(|| TraitCounter {
-                crate_name: crate_name.clone(),
-                trait_name: trait_name.clone(),
-
-                counter: AtomicU32::new(0),
-            });
-
-            if trait_counter.crate_name == crate_name && trait_counter.trait_name == trait_name {
-                return trait_counter.counter.fetch_add(1, Ordering::Relaxed);
-            }
-        }
-
-        let next = self.1.get_or_init(|| Box::new(TraitCounters::new()));
-        next.get_internal(crate_name, trait_name)
-    }
 }
 
 /// Place on an inherent impl of a [retrieval trait](macro@retrieve) in order to send it for retrieval.
@@ -227,22 +175,18 @@ impl TraitCounters {
 #[proc_macro_attribute]
 pub fn send(input: StdTokenStream, item: StdTokenStream) -> StdTokenStream {
     let item = parse_macro_input!(item as ItemImpl);
-    send_internal(input.into(), item)
+    send_internal(&input.into(), item)
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }
 
-fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStream> {
+fn send_internal(input: &TokenStream, mut item: ItemImpl) -> syn::Result<TokenStream> {
     if !input.is_empty() {
         return Err(syn::Error::new(
             input.span(),
             "This attribute accepts nothing but itself.",
         ));
     }
-
-    // Sadly the only way I know of counting...
-    // TODO: A max of 5 traits? That sucks.
-    static TRAIT_COUNTERS: TraitCounters = TraitCounters::new();
 
     let Type::Path(trait_path) = &*item.self_ty else {
         return Err(syn::Error::new(
@@ -251,42 +195,67 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
         ));
     };
     let trait_path = trait_path.path.clone();
-    let trait_ident_string = trait_path.segments.last().unwrap().ident.to_string();
-    let Ok(index) = TRAIT_COUNTERS.get(trait_ident_string) else {
-        return Err(syn::Error::new(input.span(), "Could not get crate name."));
-    };
+    let internal_path = internal_path(&trait_path)?;
+    let trait_ident_string = trait_path
+        .segments
+        .last()
+        .ok_or(syn::Error::new(
+            trait_path.span(),
+            "Expected the retrieval trait path to contain at least one segment.",
+        ))?
+        .ident
+        .to_string();
 
-    let index_previous = LitInt::new(&(index).to_string(), Span::call_site());
-    let index_current = LitInt::new(&(index + 1).to_string(), Span::call_site());
+    let (previous_implementations, replace) =
+        replaceable_implementations::replace_implementation(
+            &internal_path,
+            trait_ident_string,
+            true,
+        )
+        .map_err(|err| match err {
+            VarError::NotPresent => syn::Error::new(
+                Span::call_site(),
+                "The crate name was not present in the environment variables.",
+            ),
+            VarError::NotUnicode(crate_name) => syn::Error::new(
+                Span::call_site(),
+                format!(
+                    "The crate name was not unicode. Crate name: {}",
+                    crate_name.display(),
+                ),
+            ),
+        })?;
+    let implementation = replace(syn::parse2(quote! {
+        impl #internal_path::Final for #internal_path::Container<#previous_implementations> {}
+    })?);
 
-    *item.self_ty = Type::Verbatim(quote! {#trait_path::__internal::Container<#index_current>});
+    let current = LitInt::new(&(previous_implementations).to_string(), Span::call_site());
+    let next = LitInt::new(
+        &(previous_implementations - 1).to_string(),
+        Span::call_site(),
+    );
+
+    *item.self_ty = Type::Verbatim(quote! {#trait_path::__internal::Container<#current>});
 
     item.trait_ = Some((
         None,
         syn::parse2(quote! {#trait_path::Trait})?,
-        Default::default(),
+        <Token![for]>::default(),
     ));
 
     item.items.push(ImplItem::Verbatim(quote! {
-        type NEXT = #trait_path::__internal::Container<#index_previous>;
+        type NEXT = #trait_path::__internal::Container<#next>;
     }));
-
-    let switch_previous = Ident::new(&format!("Switch{index}"), Span::call_site());
-    let switch_current = Ident::new(&format!("Switch{}", index + 1), Span::call_site());
 
     let output = quote! {
         #item
-
-        impl<T> core::marker::Unpin for #trait_path::__internal::#switch_previous<T, false> {}
-        impl<T: #trait_path::__internal::Is<#trait_path::__internal::Container<#index_current>>> #trait_path::__internal::Final for T
-        where #trait_path::__internal::#switch_current<T, true>: core::marker::Unpin,
-        {}
+        #implementation
     };
 
     Ok(output)
 }
 
-/// Place on a generic function to convert it into a non-generic function that iterates through all implementations of a [retrieval trait](macro@retrieve).  
+/// Place on a generic function to convert it into a non-generic function that iterates through all implementations of a [retrieval trait](macro@retrieve).\
 /// Optionally allows the capacity to be specified. Defaults to 1000. The higher the capacity, the longer it will take to compile.
 ///
 /// Due to [an issue](https://github.com/coolcatcoder/retrieval/issues/7) the function must have only one generic with only one trait bound.
@@ -304,8 +273,8 @@ fn send_internal(input: TokenStream, mut item: ItemImpl) -> syn::Result<TokenStr
 ///     *index += 1;
 /// }
 ///
-/// const MESSAGES: [&str; Message::QUANTITY] = {
-///     let mut messages = [""; Message::QUANTITY];
+/// const MESSAGES: [&str; Message::QUANTITY as usize] = {
+///     let mut messages = [""; Message::QUANTITY as usize];
 ///     let mut index = 0;
 ///
 ///     collect_messages(&mut messages, &mut index);
@@ -333,8 +302,21 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
     }
 
     let module_path: syn::Path = {
-        let generic = internal.sig.generics.type_params_mut().next().unwrap();
-        let syn::TypeParamBound::Trait(trait_bound) = generic.bounds.first_mut().unwrap() else {
+        let type_param_span = internal.sig.generics.span();
+        let generic = internal
+            .sig
+            .generics
+            .type_params_mut()
+            .next()
+            .ok_or(syn::Error::new(
+                type_param_span,
+                "Expected a single type param.",
+            ))?;
+        let syn::TypeParamBound::Trait(trait_bound) = generic
+            .bounds
+            .first_mut()
+            .ok_or(syn::Error::new(type_param_span, "Expected a bound."))?
+        else {
             return Err(syn::Error::new(
                 generic.bounds.span(),
                 "The singular generic should only have one trait bound.\nPlease see https://github.com/coolcatcoder/retrieval/issues/7.",
@@ -344,7 +326,13 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
         trait_bound.path.segments.push(syn::parse2(quote! {Trait})?);
         module_path
     };
-    let generic_ident = &internal.sig.generics.type_params().next().unwrap().ident;
+    let generic_ident = &internal
+        .sig
+        .generics
+        .type_params()
+        .next()
+        .expect("TO DO: Come up with a good reason why I expect this to never fail.")
+        .ident;
 
     // Get the module from the last segment of the trait bound.
     //let trait_ident = &trait_bound.path.segments.last().unwrap().ident;
@@ -352,7 +340,7 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
     // Create the external function's signature from the internal's but without the generics.
     let mut external_sig = internal.sig.clone();
     let external_vis = internal.vis.clone();
-    external_sig.generics = Default::default();
+    external_sig.generics = Generics::default();
     let external_ident = &external_sig.ident;
     let inputs: Vec<&Pat> = external_sig
         .inputs
@@ -367,10 +355,8 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
         .collect();
 
     // The first internal function's ident.
-    let internal_start_ident = Ident::new(
-        &format!("__internal_0_{}", external_ident),
-        Span::call_site(),
-    );
+    let internal_start_ident =
+        Ident::new(&format!("__internal_0_{external_ident}"), Span::call_site());
 
     let mut output = quote! {
         #external_vis #external_sig {
@@ -401,7 +387,7 @@ fn iterate_internal(input: TokenStream, mut internal: ItemFn) -> syn::Result<Tok
         internal.block.stmts.insert(0, if_end.clone());
 
         let internal_next_ident = Ident::new(
-            &format!("__internal_{}_{}", next_index, external_ident),
+            &format!("__internal_{next_index}_{external_ident}"),
             Span::call_site(),
         );
         internal.block.stmts.push(syn::parse2(

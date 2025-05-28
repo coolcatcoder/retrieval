@@ -53,10 +53,10 @@ impl Message {
 /// So cool!
 /// Hello world!
 fn main() {
-    let mut messages = [""; Message::QUANTITY];
+    let mut messages = [""; Message::QUANTITY as usize];
     let mut index = 0;
     collect_messages(&mut messages, &mut index);
-    messages[0..index].into_iter().for_each(|message| {
+    messages[0..index].iter().for_each(|message| {
         println!("{}", message);
     });
     do_bubble();

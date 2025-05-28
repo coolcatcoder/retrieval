@@ -1,3 +1,9 @@
+# 0.3.0 (unreleased)
+## Changed
+- (BREAKING) Changed QUANTITY from a usize to a u16.
+## Removed
+- Removed the limit of 5 retrieval traits from the documentation.
+
 # 0.2.0
 ## Changed
 - The retrieve macro can be called anywhere.

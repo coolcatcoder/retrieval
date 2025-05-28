@@ -1,5 +1,5 @@
 //! Tests that every macro except retrieve works in any location.
-
+#![allow(clippy::module_inception)]
 #![allow(dead_code)]
 #![allow(non_local_definitions)]
 use retrieval::*;
@@ -27,11 +27,11 @@ const fn collect_messages<T: Number>(messages: &mut [u8], index: &mut usize) {
 
 #[test]
 fn main() {
-    let mut messages = [0; Number::QUANTITY];
+    let mut messages = [0; Number::QUANTITY as usize];
     let mut index = 0;
     collect_messages(&mut messages, &mut index);
 
-    let mut other_messages = [0; Number::QUANTITY];
+    let mut other_messages = [0; Number::QUANTITY as usize];
     let mut other_index = 0;
     other::blah::blah::collect_messages_other(&mut other_messages, &mut other_index);
 

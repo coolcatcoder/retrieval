@@ -1,6 +1,6 @@
-Allows the retrieval of trait implementations.  
-[Documentation](https://docs.rs/retrieval/)  
-[Crate](https://crates.io/crates/retrieval)  
+Allows the retrieval of trait implementations.\
+[Documentation](https://docs.rs/retrieval/)\
+[Crate](https://crates.io/crates/retrieval)\
 [Change Log](https://github.com/coolcatcoder/retrieval/blob/master/CHANGELOG.md)
 ## Example
 ```rust
@@ -32,11 +32,11 @@ impl Message {
 }
 ```
 ## Explanation
-Imagine if you could store a list of types, consts, and functions, all at compile time.  
-There are various ways of accomplishing that, but now what if instead you could automatically generate that list from desired items located anywhere in your crate?  
-It is possible, using this crate.  
+Imagine if you could store a list of types, consts, and functions, all at compile time.\
+There are various ways of accomplishing that, but now what if instead you could automatically generate that list from desired items located anywhere in your crate?\
+It is possible, using this crate.
 
-How? Simple, we create a trait that holds the items we want to collect. Then we use an attribute proc macro, that you put on each trait implementation containing the items you want to send to the list.  
+How? Simple, we create a trait that holds the items we want to collect. Then we use an attribute proc macro, that you put on each trait implementation containing the items you want to send to the list.\
 Every invocation of the attribute proc macro assumes that it is the last. When it gets invoked again, it simply unimplements the last invocation.
 
 Here is roughly an example of the techniques we use for this: [Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024&gist=073de8e13ce32c13e0ef03476b4096ea)
